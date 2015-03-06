@@ -65,8 +65,8 @@ sub draw
     my @screw_holes          = @{ $self->screw_holes };
 
     my $svg = SVG->new(
-        width  => $self->_mm_to_px( $width ),
-        height => $self->_mm_to_px( $height ),
+        width  => $self->mm_to_px( $width ),
+        height => $self->mm_to_px( $height ),
     );
 
     my $draw = $svg->group(
@@ -82,22 +82,22 @@ sub draw
     $draw->rectangle(
         x      => 0,
         y      => 0,
-        width  => $self->_mm_to_px( $width ),
-        height => $self->_mm_to_px( $height ),
+        width  => $self->mm_to_px( $width ),
+        height => $self->mm_to_px( $height ),
     );
 
     # Draw screw holes
     $draw->circle(
-        cx => $self->_mm_to_px( $_->[0] ),
-        cy => $self->_mm_to_px( $_->[1] ),
-        r  => $self->_mm_to_px( $screw_default_radius ),
+        cx => $self->mm_to_px( $_->[0] ),
+        cy => $self->mm_to_px( $_->[1] ),
+        r  => $self->mm_to_px( $screw_default_radius ),
     ) for @screw_holes;
 
     return $svg;
 }
 
 
-sub _mm_to_px
+sub mm_to_px
 {
     my ($self, $mm) = @_;
     return $mm * MM_IN_PX;

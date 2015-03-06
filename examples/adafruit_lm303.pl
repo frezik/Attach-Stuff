@@ -1,3 +1,4 @@
+#!perl
 # Copyright (c) 2015  Timm Murray
 # All rights reserved.
 # 
@@ -21,45 +22,21 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 8;
 use v5.14;
+use warnings;
 use Attach::Stuff;
 
+use constant WIDTH_MM  => 23;
+use constant HEIGHT_MM => 21;
 
 my $attach = Attach::Stuff->new({
-    width                => 26,
-    height               => 34,
+    width                => WIDTH_MM,
+    height               => HEIGHT_MM,
     screw_default_radius => 1.25,
     screw_holes          => [
-        [ 3,       3 ],
-        [ 26 - 3,  3 ],
+        [ 2.5,            3 ],
+        [ WIDTH_MM - 2.5, 3 ],
     ],
 });
 my $svg = $attach->draw;
-
-
-my $main_group = $svg->getFirstChild();
-
-my ($rect)     = $main_group->getElements( 'rect' );
-my %rect_attr  = $rect->getAttributes;
-cmp_ok( $rect_attr{width},  '==', 92.125982,  "Width set" );
-cmp_ok( $rect_attr{height}, '==', 120.472438, "Height set" );
-
-# Sort circles by their cx attribute
-my ($screw1, $screw2) = 
-    map  { $_->[1] }
-    sort { $a->[0] <=> $b->[0] }
-    map  {
-        my %attr = $_->getAttributes;
-        [ $attr{cx}, $_ ];
-    } $main_group->getElements( 'circle' );
-my %screw1_attr = $screw1->getAttributes;
-my %screw2_attr = $screw2->getAttributes;
-
-cmp_ok( $screw1_attr{cx}, '==', 10.629921 );
-cmp_ok( $screw1_attr{cy}, '==', 10.629921 );
-cmp_ok( $screw1_attr{r},  '==', 4.42913375 );
-
-cmp_ok( $screw2_attr{cx}, '==', 81.496061);
-cmp_ok( $screw2_attr{cy}, '==', 10.629921 );
-cmp_ok( $screw2_attr{r},  '==', 4.42913375 );
+print $svg->xmlify;
