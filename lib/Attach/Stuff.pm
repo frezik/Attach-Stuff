@@ -113,4 +113,82 @@ __END__
 
   Attach::Stuff - Attach stuff to other stuff
 
+=head1 SYNOPSIS
+
+    use Attach::Stuff;
+
+    # You've got a board that's 26x34 mm, with two screw holes with a 
+    # 2 mm diameter, spaced 3mm from the edge
+    my $attach = Attach::Stuff->new({
+        width                => 26,
+        height               => 34,
+        screw_default_radius => 1.25, # 2mm diameter, plus some wiggle room
+        screw_holes          => [
+            [ 3,       3 ],
+            [ 26 - 3,  3 ],
+        ],
+    });
+    my $svg = $attach->draw;
+    print $svg->xmlify;
+
+=head1 DESCRIPTION
+
+You've got stuff, like a PCB board, that needs to be attached to other stuff, 
+like a lasercut enclosure. How do you attach the stuff to the other stuff?  
+This is a question we ask a lot when doing homebuilt Internet of Things 
+projects.  Perl has the "Internet" half down pat. This module is an attempt to 
+improve the "Things" part.
+
+Lasercutters and other CNC machines often work with SVGs. Or more likely SVGs 
+can be converted into something that are converted into G-code by whatever turd 
+of a software package came with your CNC machine.  Whatever the case, you can 
+probably start with an SVG and work your way from there.
+
+Before you can get there, you need measurements of the board and the location 
+of the screw holes.  If you're lucky, you can find full schematics for your 
+board that will tell you the sizes exactly.  If not, you'll need to get out 
+some callipers and possibly do some guesswork.
+
+Protip: if you had to guess on some of the locations, etch a prototype into 
+cardboard. Then you can lay the board over the cardboard and see if it matches 
+up right.
+
+=head1 METHODS
+
+=head2 new
+
+Constructor.  Has the attributes below.  Note that all lengths are measured 
+in millimeters.
+
+=over 4
+
+=item * width
+
+=item * height
+
+=item * screw_default_radius - All screws will be this radius.  Currently, there is no way to specify a screw with any other radius.  It's recommended to add a little extra to the radius to fit the screws through.
+
+=item * screw_holes - Arrayref of arrayrefs of the x/y coords of screw holes
+
+=back
+
+=head2 draw
+
+Draw based on the parameters given in the constructor. Returns an L<SVG> 
+object.
+
+=head2 mm_to_px
+
+Takes a measurement in millimeters and returns the length in pixels according 
+to the SVG standard. Useful if you need to draw more complex shapes for your 
+board after Attach::Stuff did the basics.  See the C<examples/rpi_camera.pl> 
+file in this distribution for an example of this.
+
+
+=head1 SEE ALSO
+
+L<SVG>
+
+=head1 LICENSE
+
 =cut
