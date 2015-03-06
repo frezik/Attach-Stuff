@@ -28,11 +28,73 @@ use v5.14;
 use warnings;
 use Moose;
 use namespace::autoclean;
+use SVG;
 
 # According to SVG spec, there are 3.543307 pixels per mm.  See:
 # http://www.w3.org/TR/SVG/coords.html#Units
 use constant MM_IN_PX  => 3.543307;
 
+has 'width' => (
+    is       => 'rw',
+    isa      => 'Num',
+    required => 1,
+);
+has 'height' => (
+    is       => 'rw',
+    isa      => 'Num',
+    required => 1,
+);
+has 'screw_default_radius' => (
+    is       => 'rw',
+    isa      => 'Num',
+    required => 1,
+);
+has 'screw_holes' => (
+    is       => 'rw',
+    isa      => 'ArrayRef[ArrayRef[Num]]',
+    required => 1,
+);
+
+
+sub draw
+{
+    my ($self) = @_;
+    my $width                = $self->width;
+    my $height               = $self->height;
+    my $screw_default_radius = $self->screw_default_radius;
+    my @screw_holes          = @{ $self->screw_holes };
+
+    my $svg = SVG->new(
+        width  => $self->_mm_to_px( $width ),
+        height => $self->_mm_to_px( $height ),
+    );
+
+    my $draw = $svg->group(
+        id    => 'draw',
+        style => {
+            stroke         => 'black',
+            'stroke-width' => 0.1,
+            fill           => 'none',
+        },
+    );
+
+    # Draw outline
+    $draw->rectangle(
+        x      => 0,
+        y      => 0,
+        width  => $self->_mm_to_px( $width ),
+        height => $self->_mm_to_px( $height ),
+    );
+
+    # Draw screw holes
+    $draw->circle(
+        cx => $self->_mm_to_px( $_->[0] ),
+        cy => $self->_mm_to_px( $_->[1] ),
+        r  => $self->_mm_to_px( $screw_default_radius ),
+    ) for @screw_holes;
+
+    return $svg;
+}
 
 
 sub _mm_to_px
